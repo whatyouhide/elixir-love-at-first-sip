@@ -661,10 +661,36 @@ Elixir
 
 
 
+---
+<!-- ####################################################################### -->
 
+# Protocols
 
+<!-- Highlighted as Ruby since highlight.js is messy sometimes :( -->
+```ruby
+defprotocol Blank do
+  @doc "Tells if the given data is blank"
+  def blank?(data)
+end
+```
 
+--
 
+```elixir
+defimpl Blank, for: List do
+  def blank?([]) do
+    true
+  end
+
+  def blank?(_) do
+    false
+  end
+end
+```
+
+???
+
+Inspired by Clojure
 
 
 
