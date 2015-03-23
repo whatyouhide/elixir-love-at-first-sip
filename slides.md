@@ -694,86 +694,286 @@ Inspired by Clojure
 
 
 
+---
+<!-- ####################################################################### -->
+
+# Pipe operator
+
+???
+
+In functional languages, **transformation** of data is often emphasized.
+
+Singing the praises of an *operator* may sound silly, but the pipe operator can
+really make code **extremely** clear.
+
+--
+
+This...
+
+```elixir
+List.first(Enum.reject(String.codepoints("wat"), fn(char) -> char == "a" end))
+```
+
+--
+
+...or, equally ugly, this...
+
+```elixir
+str = "wat"
+codepoints = String.codepoints(str)
+without_a = Enum.reject(str, fn(char) -> char == "a" end)
+List.first(without_a)
+```
+
+???
+
+The pipe operator simply takes the expression on its left-hand side and
+passes it as the first argument to the function call on its right-hand side.
+
+--
+
+...becomes this:
+
+```elixir
+"wat"
+|> String.codepoints
+|> Enum.reject(fn(char) -> char == "a" end)
+|> List.first
+```
 
 
 
 ---
+<!-- ####################################################################### -->
 
+# Pipe operator
 
+Non-ridicolous (still simplified) example:
+
+```elixir
+def eval_file(path) do
+  path
+  |> File.read!
+  |> Tokenizer.tokenize
+  |> Parser.parse
+  |> Interpreter.eval
+end
+```
+
+Nice, uh?
 
 
 
 ---
+<!-- ####################################################################### -->
+
+# Tooling
+
+Great REPL (IEx):
+
+```elixir
+iex(1)> 3 + 4
+7
+iex(3)> v(1) + 4
+11
+```
+
+--
+
+Built-in templating language (EEx):
+
+```elixir
+EEx.eval_string "Hello, <%= name %>", [name: "José"]
+#=> "Hello, José"
+```
+
+--
+
+Build/test tool (mix):
+
+```bash
+mix new my_new_project
+cd my_new_project
+mix compile && mix test
+```
+
+
+
+---
+<!-- ####################################################################### -->
+
+???
+
+We saw that Elixir adds a lot of niceties to Erlang, and it's a valid
+alternative. Learning the syntax and all the quirks may not be worth it, but
+it's nice to have another option.
+
+Ok, the talk is ov-WAIT! METAPROGRAMMING!
+
+--
+
+# METAPROGRAMMING
+
+???
+
+Elixir compiler is extremely powerful and allows for extreme
+metaprogramming. First of all, this may come as a surprise but Elixir is
+actually **homoiconic**.
+
+
+
+---
+<!-- ####################################################################### -->
 
 # Homoiconicity
 
 > In a homoiconic language the primary representation of programs is also a data
 > structure in a primitive type of the language itself.
 
+The representation of Elixir code is valid Elixir code!
+
+???
+
+It's much easier to see the homoiconicity in Lisp because pretty much every
+complex data is just a list (code *and* representation). In Elixir, the syntax
+does not reflect this property.
+
 
 ---
 
 # Quoting
 
-???
-
-How does quoting work? It's very similar to languages like Lisp. You quote an
-expression and that expression is not evaluated: its AST is returned. If you
-want to inject values from the outer context into a quoted expression, you just
-**unquote** those values (just like you would do in Lisp).
-
-Small example:
-
 ```elixir
 quote do
-  foo(1, 2)
+  1 + 2
 end
-#=> {:foo, [], [1, 2]}
+#=> {:+, _metadata, [1, 2]}
 ```
 
-`{:foo, [], [1, 2]}` looks very similar to a possible Lisp analogous, `(foo 1 2)`.
+Looks not-so-different from Lisp:
+
+```lisp
+(+ 1 2)
+```
+
+???
+
+In Elixir, you can **quote** expressions to get their internal representation (AST).
+
+Quoting primitive values (like strings, numbers, atoms) returns the values
+themselves, but quoting everything else returns a three-elements tuple with:
+
+* function name
+* metadata
+* arguments
+
+--
+
+God-mode
+
+```elixir
+{:+, meta, args} = quote(do: 1 + 2)
+
+Code.eval_quoted {:-, meta, args}
+#=> {-1, []}
+```
+
+???
+
+You can manipulate the AST just like any other Elixir code.
+
 
 
 ---
+<!-- ####################################################################### -->
+
+# Unquoting
+
+--
+
+```elixir
+a = 1
+
+quote do
+  a + 3
+end
+#=> {:+, _metadata, [{:a, [], Elixir}, 3]}
+```
+
+--
+
+```elixir
+a = 1
+
+quote do
+  unquote(a) + 3
+end
+#=> {:+, _metadata, [1, 3]}
+```
+
+???
+
+When you want to inject a value into a quoted expression. Think of it like
+**string interpolation** for code.
+
+
+
+---
+<!-- ####################################################################### -->
 
 # Macros
 
+```elixir
+defmodule MyMacros do
+  defmacro unless(condition, do: something) do
+    quote do
+      if !unquote(condition) do
+        unquote(something)
+      end
+    end
+  end
+end
+```
+
+--
+
+```elixir
+require MyMacros
+
+MyMacros.unless 2 + 2 == 5 do
+  "Math still works"
+end
+#=> "Math still works"
+```
+
 ???
 
-Macros are wrappers around quoting: a macro receives its arguments as an AST (as
-if they had been quoted before having been passed to the macro) and must return
-a quoted expression (an AST). *That expression is executed in the caller's
-context, immediately*.
+Macros are wrappers around quoting: a macro receives its arguments as a quoted
+expression and must return a quoted expression (an AST). *That expression is
+executed in the caller's context, immediately*.
+
 
 
 ---
+<!-- ####################################################################### -->
 
 # Demo time!
+
+--
+
+1. Nano assertion framework
+
+--
+
+2. Logging with levels
+
+--
+
+3. The power of the compiler
+
+
 
 ???
 
 Dataset:
 https://dspl.googlecode.com/hg/datasets/google/canonical/currencies.csv
-
-
----
-
-???
-
-One point I want to stress: why using Elixir instead of Erlang?
-
-Using Elixir, you get all the power of Erlang (all the nice things like
-lightweight processes, fault-tolerance, low latency and so on) with in addition:
-
-* Homoiconicity (and thus macros)
-* Nicer syntax
-* Easy string/binary manipulation (instead of binaries/charlists in Erlang)
-* Lots of cool new libraries
-
-At the same time, however, you're really not giving up anything: Elixir has
-direct access to **everything** in the Erlang VM: you can use modules, functions
-and data structures from Erlang. Say you don't trust Elixir's `String` module:
-just call functions from the `:binary` module and you're fine.
-
-You could write Elixir code using only Erlang stuff, and you could still gain
-from macros and nicer syntax. It would still be worth it.
