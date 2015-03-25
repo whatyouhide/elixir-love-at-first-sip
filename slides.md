@@ -1,5 +1,4 @@
----
-<!-- ######################################################################## -->
+class: center, first-slide
 
 # Elixir: love at first sip
 
@@ -11,22 +10,34 @@ language is called Elixir. Well, I wasn't.
 
 
 ---
+class: sips
 <!-- ######################################################################## -->
 
+--
+
 ![The First Few Sips](images/sips/the-first-few-sips.png)
+
+--
+
 ![@elixirsips](images/sips/elixir-sips.png)
+
+--
+
 ![A Sip of Elixir](images/sips/a-sip-of-elixir.png)
 
 
 
-
-
-
-
-
-
 ---
+class: center
+<!-- ####################################################################### -->
 
+# Andrea Leopardi
+
+@whatyouhide
+
+andrea@leopardi.me
+
+.avatar[![](images/avatar.jpg)]
 
 ???
 
@@ -34,11 +45,24 @@ My name is Andrea Leopardi.
 
 I'm a recent CS graduate and I work on the web.
 
+This is my face on the internet.
+
+
+
 ---
+class: center
+<!-- ####################################################################### -->
+
+# Questions
+
+Interrupt me!
 
 ???
 
-Today I'm going to tell you about Elixir.
+If you have any questions at any moment feel free to interrupt me, I'd be glad
+if you did.
+
+So, today I'm going to tell you about Elixir.
 
 
 
@@ -46,13 +70,6 @@ Today I'm going to tell you about Elixir.
 <!-- ######################################################################## -->
 
 # Elixir
-
-Programming language that runs on the Erlang VM
-
-
-
----
-<!-- ######################################################################## -->
 
 > Elixir is a dynamic, functional language designed for building scalable and
 > maintainable applications.
@@ -95,14 +112,8 @@ end
 
 # Dynamic
 
-- Dynamically typed
-
-```elixir
-a = 1
-b = "foo"
-a = :gotcha
-```
-
+- Dynamically typed (strongly typed)
+- Runtime code evaluation
 
 
 ---
@@ -115,7 +126,10 @@ a = :gotcha
 ---
 <!-- ######################################################################## -->
 
+# Functional
+
 Immutable data structures
+
 
 ```elixir
 list = [:foo, :bar, :baz]
@@ -138,9 +152,9 @@ Data structures in Elixir are just like Erlang data structures (actually, they
 ---
 <!-- ######################################################################## -->
 
-High-order functions
+# Functional
 
---
+High-order functions
 
 ```elixir
 sum = fn(n) ->
@@ -217,13 +231,16 @@ Thanks Erlang!
 # Maintainable
 
 - Nice syntax
-- *Extremely* extensible (hint: macros!)
+- *Extremely* extensible
 - Well documented
 
 
 
 ---
+class: center, elixir-loves-erlang
 <!-- ####################################################################### -->
+
+# Elixir <3 Erlang
 
 ???
 
@@ -239,11 +256,6 @@ functional features of the language, like:
 - immutable data structures
 
 We're at a conference about functional languages after all!
-
-
-
-
-
 
 
 
@@ -294,6 +306,10 @@ bounded to it.
 ---
 <!-- ####################################################################### -->
 
+# Pattern matching
+
+Can be used in function heads:
+
 ```elixir
 def do_action(:something) do
   something()
@@ -323,10 +339,32 @@ on.
 ---
 <!-- ####################################################################### -->
 
---
+# Pattern matching + guards = polymorphism
 
-# Process
+(on steroids!)
 
+```elixir
+defmodule Math do
+  def factorial(n) when n < 0 do
+    raise "negative"
+  end
+
+  def factorial(0) do
+    0
+  end
+
+  def factorial(n) do
+    n * factorial(n - 1)
+  end
+end
+```
+
+
+
+---
+<!-- ####################################################################### -->
+
+# Processes
 
 ???
 
@@ -343,6 +381,15 @@ In Erlang, the basic unit of computation is the **process**.
 ---
 <!-- ####################################################################### -->
 
+# Processes
+
+```elixir
+pid = spawn fn ->
+  IO.puts "Hello world!"
+end
+#=> #PID<0.61.0>
+```
+
 ???
 
 If you understand how an Erlang process works, then you will see all the power
@@ -354,18 +401,6 @@ process*. It is entirely handled by the VM, allowing processes to:
 - be very lightweight
 - behave consistently over different OSs
 
---
-
-```elixir
-pid = spawn fn ->
-  IO.puts "Hello world!"
-end
-#=> #PID<0.61.0>
-```
-
-
-???
-
 A process is created by **spawning** a function.
 
 
@@ -373,7 +408,8 @@ A process is created by **spawning** a function.
 ---
 <!-- ####################################################################### -->
 
-# Lightweight
+# **Lightweight** processes
+
 
 ```elixir
 :timer.tc fn ->
@@ -410,7 +446,6 @@ end
 send pid, "Hello!"
 #=> "Hello!"
 ```
-
 
 ???
 
@@ -469,10 +504,12 @@ process waits for one (with a configurable timeout).
 
 
 ---
+class: actor
 <!-- ####################################################################### -->
 
 ```elixir
 defmodule Actor do
+  # "Client"
   def start(initial_state) do
     spawn fn -> loop(initial_state) end
   end
@@ -488,6 +525,7 @@ defmodule Actor do
     send pid, {:put, self(), state}
   end
 
+  # "Server"
   def loop(state) do
     receive do
       {:get, from} ->
@@ -499,6 +537,8 @@ defmodule Actor do
   end
 end
 ```
+
+--
 
 ```elixir
 actor = Actor.start(1)
@@ -519,7 +559,11 @@ fit in a slide.
 ---
 <!-- ####################################################################### -->
 
-Nothing happens to the current process:
+# Error handling
+
+Processes can be linked or monitored.
+
+--
 
 ```elixir
 spawn fn ->
@@ -529,8 +573,6 @@ end
 
 --
 
-The exception is *propagated* to the current process:
-
 ```elixir
 spawn_link fn ->
   raise "die with me!"
@@ -539,15 +581,12 @@ end
 
 --
 
-The current process is *notified* of the failure:
-
 ```elixir
-spawn_monitor fn -> might_fail() end
-
-receive do
-  {:DOWN, _ref, :process, _pid, _reason} ->
-    spawn_monitor fn -> might_fail() end
+spawn_monitor fn ->
+  raise "die"
 end
+
+# self() receives a :DOWN message
 ```
 
 ???
@@ -571,6 +610,18 @@ process that monitors other processes and restarts them when they fail.
 
 # Let it crash!
 
+--
+
+```elixir
+spawn_monitor fn -> might_fail() end
+
+receive do
+  {:DOWN, _ref, :process, _pid, _reason} ->
+    spawn_monitor fn -> might_fail() end
+end
+```
+
+
 ???
 
 This brings us to an important phylosophy encouraged by Erlang: **let it crash**.
@@ -583,14 +634,17 @@ to fix the mess, just restart it in order to bring it back to a known initial st
 
 
 
-
-
 ---
+class: center, like-cs-for-js
 <!-- ####################################################################### -->
 
 Ah, like CoffeeScript for JavaScript
 
-NO
+--
+
+.no[NO]
+
+--
 
 More like Clojure for Java
 
@@ -607,8 +661,16 @@ an extremely valid choice over Erlang.
 
 
 ---
+class: funny-quote
 <!-- ####################################################################### -->
 
+> Elixir is what would happend if **Erlang**, **Clojure** and **Ruby** somehow
+> had a baby and it wasn't an accident.
+> -- <cite>Devin Torres</cite>
+
+
+---
+<!-- ####################################################################### -->
 
 # Interop
 
@@ -716,22 +778,6 @@ List.first(Enum.reject(String.codepoints("wat"), fn(char) -> char == "a" end))
 
 --
 
-...or, equally ugly, this...
-
-```elixir
-str = "wat"
-codepoints = String.codepoints(str)
-without_a = Enum.reject(str, fn(char) -> char == "a" end)
-List.first(without_a)
-```
-
-???
-
-The pipe operator simply takes the expression on its left-hand side and
-passes it as the first argument to the function call on its right-hand side.
-
---
-
 ...becomes this:
 
 ```elixir
@@ -740,6 +786,11 @@ passes it as the first argument to the function call on its right-hand side.
 |> Enum.reject(fn(char) -> char == "a" end)
 |> List.first
 ```
+
+???
+
+The pipe operator simply takes the expression on its left-hand side and
+passes it as the first argument to the function call on its right-hand side.
 
 
 
@@ -778,7 +829,12 @@ iex(3)> v(1) + 4
 11
 ```
 
---
+
+
+---
+<!-- ####################################################################### -->
+
+# Tooling
 
 Built-in templating language (EEx):
 
@@ -787,20 +843,50 @@ EEx.eval_string "Hello, <%= name %>", [name: "José"]
 #=> "Hello, José"
 ```
 
---
 
-Build/test tool (mix):
+
+---
+<!-- ####################################################################### -->
+
+# Tooling
+
+Build/test/project management tool (Mix):
 
 ```bash
 mix new my_new_project
 cd my_new_project
-mix compile && mix test
+mix compile
+mix test
 ```
 
 
 
 ---
 <!-- ####################################################################### -->
+
+# Tooling
+
+Package manager (Hex):
+
+```elixir
+def dependencies do
+  [{:cowboy, "~> 1.0"},
+   {:plug, github: "elixir-lang/plug"}]
+end
+```
+
+(not in the core)
+
+
+
+---
+<!-- ####################################################################### -->
+
+Ok, so that's pretty much it...
+
+--
+
+.wait[WAIT]
 
 ???
 
@@ -810,7 +896,11 @@ it's nice to have another option.
 
 Ok, the talk is ov-WAIT! METAPROGRAMMING!
 
---
+
+
+---
+class: metaprogramming, center
+<!-- ####################################################################### -->
 
 # METAPROGRAMMING
 
@@ -819,6 +909,38 @@ Ok, the talk is ov-WAIT! METAPROGRAMMING!
 Elixir compiler is extremely powerful and allows for extreme
 metaprogramming. First of all, this may come as a surprise but Elixir is
 actually **homoiconic**.
+
+
+
+---
+class: center
+<!-- ####################################################################### -->
+
+# MACROS!
+
+.kid[![](images/metaprogramming.gif)]
+
+
+
+---
+class: center
+<!-- ####################################################################### -->
+
+# HOMOICONICITY!
+
+.andy[![](images/homoiconicity.gif)]
+
+
+
+---
+class: center
+<!-- ####################################################################### -->
+
+.minions[![](images/minions.gif)]
+
+???
+
+To be honest, this is how I imagined you at this point but, well... ok.
 
 
 
@@ -971,9 +1093,21 @@ executed in the caller's context, immediately*.
 
 3. The power of the compiler
 
-
-
 ???
 
 Dataset:
 https://dspl.googlecode.com/hg/datasets/google/canonical/currencies.csv
+
+
+
+---
+class: center
+<!-- ####################################################################### -->
+
+# Questions?
+
+Andrea Leopardi
+
+@whatyouhide (twitter/github)
+
+andrea@leopardi.me
