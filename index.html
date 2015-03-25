@@ -3,25 +3,12 @@
   <head>
     <title>Title</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
 
   <body>
-    <script src="lib/highlight.pack.js"></script>
-    <script src="lib/remark-latest.min.js"></script>
-    <script>
-      remark.highlighter.engine = hljs;
-      remark.create({
-        sourceUrl: 'slides.md',
-        navigation: {
-          scroll: false,
-          touch: false,
-          click: false
-        },
-        ratio: '4:3',
-        slideNumberFormat: '',
-        highlightStyle: 'monokai',
-      });
-    </script>
+    <script type="text/javascript" src="lib/highlight.pack.js"></script>
+    <script type="text/javascript" src="lib/remark-latest.min.js"></script>
+    <script type="text/javascript" src="index.js"></script>
   </body>
 </html>
