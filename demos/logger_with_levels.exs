@@ -13,3 +13,14 @@ defmodule LoggerWithLevels do
     nil
   end
 end
+
+defmodule Test do
+  import LoggerWithLevels
+
+  def test do
+    log :debug, "Debugging"
+    log :prod, "In production"
+  end
+end
+
+Test.test
