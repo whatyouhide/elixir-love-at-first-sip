@@ -9,7 +9,7 @@ defmodule MoneyPlease.Mixfile do
   end
 
   defp deps do
-    [{:httpoison, github: "edgurgel/httpoison"}]
+    [{:httpoison, "~> 0.6"}]
   end
 
   def application do
