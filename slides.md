@@ -43,9 +43,14 @@ andrea@leopardi.me
 
 My name is Andrea Leopardi.
 
-I'm a recent CS graduate and I work on the web.
-
 This is my face on the internet.
+
+I'm a recent CS graduate. I've been working on the web for about three years
+now, doing frontend work at the beginning and backend work now.
+
+I met Elixir about four months ago and I loved it right away; I started using it
+on a bunch of project and I've been contributing to a lot of Elixir libraries
+out there, including some work with the Elixir team.
 
 
 
@@ -90,6 +95,39 @@ So, let's briefly see what that means.
 ---
 <!-- ######################################################################## -->
 
+# Erlang
+
+--
+- ERicsson LANGuage
+
+--
+- Built to handle telecom applications
+
+--
+- In 1986, ~30 years ago!
+
+--
+- Features:
+
+--
+  - Highly available
+
+--
+  - Extremely concurrent
+
+--
+  - Fault tolerant
+
+???
+
+Elixir is a language built on top of the Erlang virtual machine. It shares
+pretty much everything with Erlang: Elixir data structures are Erlang data
+structures, Elixir functions are Erlang functions and so on.
+
+
+---
+<!-- ######################################################################## -->
+
 # What does it look like
 
 ```elixir
@@ -104,6 +142,19 @@ defmodule Slugger do
   end
 end
 ```
+
+???
+
+This is what Elixir looks like, just to give you an idea.
+
+So, the pitch I showed you before said Elixir is:
+
+- **Dynamic**
+- **Functional**
+- Designed for building **scalable**
+- and **maintainable** applications
+
+Let's take a look at those four points.
 
 
 
@@ -141,11 +192,10 @@ list
 #=> [:foo, :bar, :baz]
 ```
 
-
 ???
 
-Data structures in Elixir are just like Erlang data structures (actually, they
-*are* Erlang data structures).
+Most Elixir (actually, Erlang) data structures are immutable, with only a
+handful of exceptions.
 
 
 
@@ -175,9 +225,6 @@ end
 #=> [3, 6, 9, 12]
 ```
 
-???
-
-Elixir functions are Erlang functions and Elixir modules are Erlang modules.
 
 
 ---
@@ -223,6 +270,13 @@ end
 
 Thanks Erlang!
 
+???
+
+As I said, the Erlang VM has awesome support for concurrency, and Elixir takes
+advantage of all that.
+
+We will dig deeper into this later on.
+
 
 
 ---
@@ -234,6 +288,17 @@ Thanks Erlang!
 - *Extremely* extensible
 - Well documented
 
+???
+
+Erlang's syntax is derived from Prolog and it isn't very nice, especially since
+very few people are familiar with Prolog. Elixir is very Ruby-ish in its syntax,
+so it has a friendlier syntax.
+
+We'll talk about extensibility later on.
+
+The documentation is very thorough and there's first-class support for
+documentation baked right in the language.
+
 
 
 ---
@@ -244,10 +309,14 @@ class: center, elixir-loves-erlang
 
 ???
 
-As I said, Elixir shares most of its features with Erlang. In the next part of
-the talk, I will first highlight some of the great things that Elixir inherits
-from Erlang, then I will focus on what Elixir brings to the table when compared
-with Erlang.
+As I said, Elixir shares most of its features with Erlang.
+
+I will divide the rest of this talk in two main parts:
+
+- in the first one I'll talk about all the awesome things that Elixir inherits
+  from Erlang
+- in the second one I'll focus on what Elixir brings to the table and why one
+  may want to choose it over Erlang
 
 I will skim over the basics (syntax, data types) and over the "classic"
 functional features of the language, like:
@@ -266,6 +335,11 @@ We're at a conference about functional languages after all!
 
 `=` is not what it looks like.
 
+???
+
+This is a feature that a lot of languages have, and it's a feature that makes it
+hard to program in languages that don't have it.
+
 --
 
 ```elixir
@@ -277,6 +351,13 @@ first  #=> 1
 second #=> 2
 rest   #=> [3, 4]
 ```
+
+???
+
+We can match the structure of some data and bind variables while doing it.
+
+Pattern matching is extremely useful to destructure complex data and filter only
+the data we need.
 
 --
 
@@ -291,12 +372,8 @@ rest_of_the_string #=> "ments"
 
 ???
 
-`=` doesn't mean assignment, but it means pattern matching.
-
-Similar to Haskell or ML.
-
-Extremely useful in order to destructure complex data (and often only keep the
-data we're interested in).
+We can match on arbitrarily complex data structures and we also can match on the
+values (instead of just binding).
 
 `=` can be used à-la-assignment because a "variable" matches anything and is
 bounded to it.
@@ -322,17 +399,12 @@ end
 
 ???
 
-Pattern matching can be used in function heads.
+Pattern matching can be used in function heads too.
 
-This is extremely common in Erlang/Elixir for two reasons:
-
+- it is very optimized by the Erlang VM
 - it makes code much cleaner and easier to understand than when conditionals are
   used (since the spotlight is on the structure of the data) and it moves that
   logic "out" of the function
-- it is very optimized by the Erlang VM
-
-We will see an example of how we can take advantage of pattern matching later
-on.
 
 
 
@@ -350,7 +422,7 @@ defmodule Math do
   end
 
   def factorial(0) do
-    0
+    1
   end
 
   def factorial(n) do
@@ -358,6 +430,16 @@ defmodule Math do
   end
 end
 ```
+
+???
+
+Usually polymorphism is done through types.
+
+In Elixir you can do that through guards and a bunch of type-related test
+functions (like `is_integer/1`), but you can push further and guard on the value
+of the arguments.
+
+This provides even *more* polymorphism, so to speak :).
 
 
 
@@ -368,13 +450,19 @@ end
 
 ???
 
-Compiling to Erlang code and running on the Erlang VM allows Elixir to leverage
-all the power of Erlang itself.
-
 Erlang allows to build very distributed, scalable and fault-tolerant
 applications.
 
 In Erlang, the basic unit of computation is the **process**.
+
+If you understand how an Erlang process works, then you will see all the power
+of this language.
+
+The first thing to keep in mind is that *an Erlang/Elixir process is not an OS
+process*. It is entirely handled by the VM, allowing processes to:
+
+- be very lightweight
+- behave consistently over different OSs
 
 
 
@@ -392,16 +480,8 @@ end
 
 ???
 
-If you understand how an Erlang process works, then you will see all the power
-of this language.
-
-The first thing to keep in mind is that *an Erlang/Elixir process is not an OS
-process*. It is entirely handled by the VM, allowing processes to:
-
-- be very lightweight
-- behave consistently over different OSs
-
-A process is created by **spawning** a function.
+A process is created by **spawning** a function. Obviously, spawning is
+asynchronous (or it wouldn't make sense, right?).
 
 
 
@@ -414,7 +494,7 @@ A process is created by **spawning** a function.
 ```elixir
 :timer.tc fn ->
   Enum.each 1..100_000, fn(_) ->
-    spawn(fn -> :foo end)
+*   spawn(fn -> :foo end)
   end
 end
 #=> {1735741, :ok}
@@ -422,14 +502,11 @@ end
 
 That's about **1.7s** for 100k spawned processes!
 
-
 ???
 
-Processes are **extremely** lightweight.
-
-(*Don't mind the syntax, we will briefly talk about it later on*)
-
-{Show that code in the console}
+Processes are **extremely** lightweight since they're handled by the VM. In the
+example, we're timing (`:timer.tc`) the spawning of a *hundred thousand*
+processes and it only takes less than two seconds to do it.
 
 
 
@@ -449,14 +526,14 @@ send pid, "Hello!"
 
 ???
 
-Processes cannot share memory. The only form of communication between processes
-is through *asynchronous* message passing.
+Processes cannot share memory.
 
-You can *send* a process some message by using the primitive `send/2` passing
-the pid of the process. Sending is *asynchronous*, and `send/2` will always
-return the second argument passed to it.
+The only form of communication between processes is through *asynchronous*
+message passing.
 
-Messages send to a process are guaranteed to be delivered to that process, and
+Sending is **asynchronous**; it always returns the message being sent.
+
+Messages sent to a process are guaranteed to be delivered to that process, and
 they end up in that process' **message queue**.
 
 
@@ -471,10 +548,18 @@ pid = spawn fn ->
   receive do
     {from, :hello} -> send from, {self(), "Hello to you!"}
     {from, :bye}   -> send from, {self(), "Bye bye!"}
-    _              -> send from, {self(), "Eh?"}
   end
 end
 ```
+???
+
+Receiving messages is **synchronous** and done through the `receive` construct.
+
+When a process calls `receive`, the first message in the queue that matches one
+of the patterns is removed from the queue. If no messages are in the queue, the
+process waits for one.
+
+The process stops receving only if a message matches one of the patterns.
 
 --
 
@@ -491,15 +576,6 @@ receive do
 end
 #=> "Response: Hello to you!"
 ```
-
-???
-
-To receive a message, a process has to use the `receive` construct. Receiving
-messages is *blocking*.
-
-When a process calls `receive`, the first message in the queue that matches one
-of the patterns is removed from the queue. If no messages are in the queue, the
-process waits for one (with a configurable timeout).
 
 
 
@@ -538,6 +614,16 @@ defmodule Actor do
 end
 ```
 
+???
+
+These constructs give enough power to implement complex behaviours.
+
+For example, you can implement an instance of the actor pattern to keep state
+with just these primitives.
+
+I know this is a lot of code for one slide, but it's just to show that it looks
+very concise and short and isn't particularly complicated.
+
 --
 
 ```elixir
@@ -548,90 +634,27 @@ Actor.get(actor)
 #=> 2
 ```
 
-???
-
-With just these constructs, we can easily implement fairly complicated
-things. For example, the implementation of something akin to the actor model can
-fit in a slide.
-
 
 
 ---
+class: center, otp
 <!-- ####################################################################### -->
 
-# Error handling
+# OTP
 
-Processes can be linked or monitored.
-
---
-
-```elixir
-spawn fn ->
-  raise "dead :("
-end
-```
-
---
-
-```elixir
-spawn_link fn ->
-  raise "die with me!"
-end
-```
-
---
-
-```elixir
-spawn_monitor fn ->
-  raise "die"
-end
-
-# self() receives a :DOWN message
-```
+Open Telecom Platform
 
 ???
 
-The other thing that makes Erlang processes so powerful is error handling.
+We could talk a lot longer about Erlang processes and concurrency, especially
+since Erlang has OTP.
 
-When you spawn a process and that process dies abnormally (e.g., unhandled
-exception) nothing happens to the parent process.
+The OTP is a set of Erlang libraries which solve the most common
+concurrency-related problems.
 
-In order to propagate the error processes have to be **linked**. Links work
-bilaterally.
-
-If you want to only be notified when a process dies (unilaterally), then
-**monitors** are the answer. This is extremely useful when you want to have a
-process that monitors other processes and restarts them when they fail.
-
-
-
----
-<!-- ####################################################################### -->
-
-# Let it crash!
-
---
-
-```elixir
-spawn_monitor fn -> might_fail() end
-
-receive do
-  {:DOWN, _ref, :process, _pid, _reason} ->
-    spawn_monitor fn -> might_fail() end
-end
-```
-
-
-???
-
-This brings us to an important phylosophy encouraged by Erlang: **let it crash**.
-
-When something is going wrong with a computer, one of the easiest thing to do is
-to simply *reboot* it: bring it back to an initial known initial state.
-
-Erlang encourages to do the same thing: when a process fails, instead of trying
-to fix the mess, just restart it in order to bring it back to a known initial state.
-
+We won't have time to dig into it, but if you're interested in it just **run**
+to the *Closure Hall* where there's an entire workshop on it happening **right
+now** :).
 
 
 ---
@@ -639,6 +662,18 @@ class: center, like-cs-for-js
 <!-- ####################################################################### -->
 
 Ah, like CoffeeScript for JavaScript
+
+???
+
+This is the point where people usually arrive at the conclusion that Elixir is
+for Erlang what CoffeeScript is for JavaScript: a nicer syntax over the same language.
+
+That's not true.
+
+It's very similar to what Clojure is for Java.
+
+In the rest of the talk, we will talk about what makes Elixir great and why it's
+a valid choice over Erlang.
 
 --
 
@@ -648,31 +683,34 @@ Ah, like CoffeeScript for JavaScript
 
 More like Clojure for Java
 
-???
-
-So, Elixir inherits a lot of its power from Erlang. At this point, one could
-argue that Elixir is like CoffeeScript for JavaScript.
-
-It's very similar to what Clojure is for Java.
-
-In the rest of the talk, we will talk about what makes Elixir great and why it's
-an extremely valid choice over Erlang.
-
 
 
 ---
 class: funny-quote
 <!-- ####################################################################### -->
 
-> Elixir is what would happend if **Erlang**, **Clojure** and **Ruby** somehow
+> Elixir is what would happen if **Erlang**, **Clojure** and **Ruby** somehow
 > had a baby and it wasn't an accident.
 > -- <cite>Devin Torres</cite>
+
+???
+
+This quote nicely sums up what Elixir is.
+
 
 
 ---
 <!-- ####################################################################### -->
 
 # Interop
+
+???
+
+When you build a language on top of another, one of the most important things is
+compatibility.
+
+Erlang is ~30 years old, so it has a lot of libraries around and it's nice you
+can use them from Elixir.
 
 --
 
@@ -683,8 +721,6 @@ random:uniform().
 %=> 0.4435846174457203
 ```
 
---
-
 Elixir
 
 ```elixir
@@ -694,7 +730,8 @@ Elixir
 
 ???
 
-It's so easy to use Erlang from Elixir that it's almost ridicolous.
+Actually, you're often forced to use Erlang libraries (e.g., `crypto`) since
+there is no Elixir alternative.
 
 
 
@@ -703,8 +740,6 @@ It's so easy to use Erlang from Elixir that it's almost ridicolous.
 
 # Interop
 
---
-
 Erlang
 
 ```erlang
@@ -712,14 +747,16 @@ lists:map(fun(El) -> El + 2 end, [1, 2, 3]).
 %=> [3, 4, 5]
 ```
 
---
-
 Elixir
 
 ```elixir
 :lists.map(fn(el) -> el + 2 end, [1, 2, 3])
 #=> [3, 4, 5]
 ```
+
+???
+
+Elixir can interop with data structures too, since they're shared with Erlang.
 
 
 
@@ -731,28 +768,33 @@ Elixir
 <!-- Highlighted as Ruby since highlight.js is messy sometimes :( -->
 ```ruby
 defprotocol Blank do
-  @doc "Tells if the given data is blank"
   def blank?(data)
+end
+```
+
+???
+
+Inspired by Clojure. Similar to interfaces.
+
+Another tool for polymorphism; they make many things extremely easy, like the
+`Inspect` protocol with which data structures can print themselves.
+
+--
+
+```elixir
+defimpl Blank, for: List do
+  def blank?(list) do
+    Enum.empty? list
+  end
 end
 ```
 
 --
 
 ```elixir
-defimpl Blank, for: List do
-  def blank?([]) do
-    true
-  end
-
-  def blank?(_) do
-    false
-  end
-end
+Blank.blank? []        #=> true
+Blank.blank? [1, 2, 3] #=> false
 ```
-
-???
-
-Inspired by Clojure
 
 
 
@@ -763,8 +805,6 @@ Inspired by Clojure
 
 ???
 
-In functional languages, **transformation** of data is often emphasized.
-
 Singing the praises of an *operator* may sound silly, but the pipe operator can
 really make code **extremely** clear.
 
@@ -773,7 +813,7 @@ really make code **extremely** clear.
 This...
 
 ```elixir
-List.first(Enum.reject(String.codepoints("wat"), fn(char) -> char == "a" end))
+Enum.map(List.flatten([1, [2], 3]), fn(x) -> x * 2 end)
 ```
 
 --
@@ -781,16 +821,20 @@ List.first(Enum.reject(String.codepoints("wat"), fn(char) -> char == "a" end))
 ...becomes this:
 
 ```elixir
-"wat"
-|> String.codepoints
-|> Enum.reject(fn(char) -> char == "a" end)
-|> List.first
+[1, [2], 3]
+|> List.flatten
+|> Enum.map(fn(x) -> x * 2 end)
 ```
 
 ???
 
 The pipe operator simply takes the expression on its left-hand side and
 passes it as the first argument to the function call on its right-hand side.
+
+It works just like the Unix pipe. It's really useful especially because Elixir
+is a functional language, and functional languages are often based on
+transforming data (because of immutability). The pipe operator makes
+transformation very clear.
 
 
 
@@ -904,12 +948,6 @@ class: metaprogramming, center
 
 # METAPROGRAMMING
 
-???
-
-Elixir compiler is extremely powerful and allows for extreme
-metaprogramming. First of all, this may come as a surprise but Elixir is
-actually **homoiconic**.
-
 
 
 ---
@@ -956,9 +994,8 @@ The representation of Elixir code is valid Elixir code!
 
 ???
 
-It's much easier to see the homoiconicity in Lisp because pretty much every
-complex data is just a list (code *and* representation). In Elixir, the syntax
-does not reflect this property.
+This will be familiar to Lispers because the syntax reflects this property.
+
 
 
 ---
@@ -972,6 +1009,13 @@ end
 #=> {:+, _metadata, [1, 2]}
 ```
 
+???
+
+You can **quote** an expression to get its internal representation (the
+*Abstract Syntax Tree*).
+
+--
+
 Looks not-so-different from Lisp:
 
 ```lisp
@@ -980,10 +1024,8 @@ Looks not-so-different from Lisp:
 
 ???
 
-In Elixir, you can **quote** expressions to get their internal representation (AST).
-
-Quoting primitive values (like strings, numbers, atoms) returns the values
-themselves, but quoting everything else returns a three-elements tuple with:
+Quoting a primitive value returns that value, while quoting everything else
+returns a three-elements tuple with:
 
 * function name
 * metadata
@@ -991,13 +1033,14 @@ themselves, but quoting everything else returns a three-elements tuple with:
 
 --
 
-God-mode
-
 ```elixir
-{:+, meta, args} = quote(do: 1 + 2)
+{op, meta, args} = quote(do: 1 + 2)
 
-Code.eval_quoted {:-, meta, args}
-#=> {-1, []}
+new_args = Enum.map(args, fn(x) -> x * 2 end)
+#=> [2, 4]
+
+Code.eval_quoted {op, meta, new_args}
+#=> 6
 ```
 
 ???
@@ -1022,6 +1065,11 @@ end
 #=> {:+, _metadata, [{:a, [], Elixir}, 3]}
 ```
 
+???
+
+When you want to inject a value into a quoted expression. Think of it like
+**string interpolation** for code.
+
 --
 
 ```elixir
@@ -1032,11 +1080,6 @@ quote do
 end
 #=> {:+, _metadata, [1, 3]}
 ```
-
-???
-
-When you want to inject a value into a quoted expression. Think of it like
-**string interpolation** for code.
 
 
 
@@ -1057,43 +1100,37 @@ defmodule MyMacros do
 end
 ```
 
+???
+
+Defining a macro is analogous to defining a function, except it receives ASTs
+instead of values and returns an AST.
+
 --
 
 ```elixir
-require MyMacros
-
 MyMacros.unless 2 + 2 == 5 do
   "Math still works"
 end
 #=> "Math still works"
 ```
 
-???
-
-Macros are wrappers around quoting: a macro receives its arguments as a quoted
-expression and must return a quoted expression (an AST). *That expression is
-executed in the caller's context, immediately*.
-
 
 
 ---
+class: center, demo-time
 <!-- ####################################################################### -->
 
 # Demo time!
 
---
-
-1. Nano assertion framework
-
---
-
-2. Logging with levels
-
---
-
-3. The power of the compiler
+May the demo gods be with me
 
 ???
+
+People who are familiar with macros know the power they bring with them, but I
+think it's hard to grasp it just by explaining how they work.
+
+So, for the remaining part of the talk, I'd like to quickly show you some use
+cases of macros.
 
 Dataset:
 https://dspl.googlecode.com/hg/datasets/google/canonical/currencies.csv
