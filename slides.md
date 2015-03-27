@@ -2,29 +2,6 @@ class: center, first-slide
 
 # Elixir: love at first sip
 
-???
-
-I thought I was being clever by using the word "sip" in the talk title since the
-language is called Elixir. Well, I wasn't.
-
-
-
----
-class: sips
-<!-- ######################################################################## -->
-
---
-
-![The First Few Sips](images/sips/the-first-few-sips.png)
-
---
-
-![@elixirsips](images/sips/elixir-sips.png)
-
---
-
-![A Sip of Elixir](images/sips/a-sip-of-elixir.png)
-
 
 
 ---
@@ -55,7 +32,7 @@ out there, including some work with the Elixir team.
 
 
 ---
-class: center
+class: center, questions
 <!-- ####################################################################### -->
 
 # Questions
@@ -87,8 +64,6 @@ Nice!
 
 I could have come up with a nice pitch for Elixir, but I'm lazy and the Elixir
 website already has one.
-
-So, let's briefly see what that means.
 
 
 
@@ -128,7 +103,7 @@ structures, Elixir functions are Erlang functions and so on.
 ---
 <!-- ######################################################################## -->
 
-# What does it look like
+# What it looks like
 
 ```elixir
 defmodule Slugger do
@@ -143,35 +118,24 @@ defmodule Slugger do
 end
 ```
 
+
+
+---
+class: center, elixir-loves-erlang
+<!-- ####################################################################### -->
+
+# Elixir <3 Erlang
+
 ???
 
-This is what Elixir looks like, just to give you an idea.
+As I said, Elixir shares most of its features with Erlang.
 
-So, the pitch I showed you before said Elixir is:
+I will divide the rest of this talk in two main parts:
 
-- **Dynamic**
-- **Functional**
-- Designed for building **scalable**
-- and **maintainable** applications
-
-Let's take a look at those four points.
-
-
-
----
-<!-- ######################################################################## -->
-
-# Dynamic
-
-- Dynamically typed (strongly typed)
-- Runtime code evaluation
-
-
----
-<!-- ######################################################################## -->
-
-# Functional
-
+- in the first one I'll talk about all the awesome things that Elixir inherits
+  from Erlang
+- in the second one I'll focus on what Elixir brings to the table and why one
+  may want to choose it over Erlang
 
 
 ---
@@ -252,79 +216,6 @@ iex> :erlang.now()
 iex> :erlang.now()
 {1426, 179478, 386986}
 ```
-
-
-
----
-<!-- ######################################################################## -->
-
-# Scalable
-
-```elixir
-for _ <- 1..1_000_000 do
-  spawn fn ->
-    "hello"
-  end
-end
-```
-
-Thanks Erlang!
-
-???
-
-As I said, the Erlang VM has awesome support for concurrency, and Elixir takes
-advantage of all that.
-
-We will dig deeper into this later on.
-
-
-
----
-<!-- ######################################################################## -->
-
-# Maintainable
-
-- Nice syntax
-- *Extremely* extensible
-- Well documented
-
-???
-
-Erlang's syntax is derived from Prolog and it isn't very nice, especially since
-very few people are familiar with Prolog. Elixir is very Ruby-ish in its syntax,
-so it has a friendlier syntax.
-
-We'll talk about extensibility later on.
-
-The documentation is very thorough and there's first-class support for
-documentation baked right in the language.
-
-
-
----
-class: center, elixir-loves-erlang
-<!-- ####################################################################### -->
-
-# Elixir <3 Erlang
-
-???
-
-As I said, Elixir shares most of its features with Erlang.
-
-I will divide the rest of this talk in two main parts:
-
-- in the first one I'll talk about all the awesome things that Elixir inherits
-  from Erlang
-- in the second one I'll focus on what Elixir brings to the table and why one
-  may want to choose it over Erlang
-
-I will skim over the basics (syntax, data types) and over the "classic"
-functional features of the language, like:
-
-- high-order functions
-- immutable data structures
-
-We're at a conference about functional languages after all!
 
 
 
@@ -717,32 +608,6 @@ can use them from Elixir.
 Erlang
 
 ```erlang
-random:uniform().
-%=> 0.4435846174457203
-```
-
-Elixir
-
-```elixir
-:random.uniform
-#=> 0.4435846174457203
-```
-
-???
-
-Actually, you're often forced to use Erlang libraries (e.g., `crypto`) since
-there is no Elixir alternative.
-
-
-
----
-<!-- ####################################################################### -->
-
-# Interop
-
-Erlang
-
-```erlang
 lists:map(fun(El) -> El + 2 end, [1, 2, 3]).
 %=> [3, 4, 5]
 ```
@@ -756,45 +621,8 @@ Elixir
 
 ???
 
-Elixir can interop with data structures too, since they're shared with Erlang.
-
-
-
----
-<!-- ####################################################################### -->
-
-# Protocols
-
-<!-- Highlighted as Ruby since highlight.js is messy sometimes :( -->
-```ruby
-defprotocol Blank do
-  def blank?(data)
-end
-```
-
-???
-
-Inspired by Clojure. Similar to interfaces.
-
-Another tool for polymorphism; they make many things extremely easy, like the
-`Inspect` protocol with which data structures can print themselves.
-
---
-
-```elixir
-defimpl Blank, for: List do
-  def blank?(list) do
-    Enum.empty? list
-  end
-end
-```
-
---
-
-```elixir
-Blank.blank? []        #=> true
-Blank.blank? [1, 2, 3] #=> false
-```
+Actually, you're often forced to use Erlang libraries (e.g., `crypto`) since
+there is no Elixir alternative.
 
 
 
@@ -841,21 +669,37 @@ transformation very clear.
 ---
 <!-- ####################################################################### -->
 
-# Pipe operator
-
-Non-ridicolous (still simplified) example:
+# First-class documentation
 
 ```elixir
-def eval_file(path) do
-  path
-  |> File.read!
-  |> Tokenizer.tokenize
-  |> Parser.parse
-  |> Interpreter.eval
+defmodule Math do
+  @moduledoc "Provides silly math facilities."
+
+  @doc """
+  Adds 42 to the given number.
+
+  *Really* useless.
+
+  ## Examples
+
+      iex> add42(10)
+      52
+
+  """
+  def add42(n) do
+    n + 42
+  end
 end
 ```
 
-Nice, uh?
+???
+
+Markdown documentation for functions and modules.
+
+We can also retrieve that documentation programmatically, as well as generate
+HTML documentations with tools provided by Elixir itself.
+
+You can also **doctest** modules: that is, run the `iex>` examples and check the result.
 
 
 
@@ -885,6 +729,25 @@ Built-in templating language (EEx):
 ```elixir
 EEx.eval_string "Hello, <%= name %>", [name: "José"]
 #=> "Hello, José"
+```
+
+
+
+---
+<!-- ####################################################################### -->
+
+# Tooling
+
+Built-in test framework:
+
+```elixir
+defmodule MathTest do
+  use ExUnit.Case, async: true
+
+  test "add42" do
+    assert add42(10) == 52
+  end
+end
 ```
 
 
