@@ -980,6 +980,53 @@ end
 
 
 ---
+<!-- ####################################################################### -->
+
+# Hygienic macros
+
+```elixir
+defmacro inject_var do
+  quote do
+    a = 1
+  end
+end
+```
+
+???
+
+Macros are expandend and executed inside the caller's context but by default
+they can't access or modify the caller's context.
+
+For example, you can't modify variables from ouside the macro.
+
+--
+
+```elixir
+a = 0
+inject_var
+
+a #=> 0
+```
+
+???
+
+This lets you write macros which are a lot easier to reason about.
+
+You can override this behaviour if need be.
+
+--
+
+```elixir
+defmacro inject_var do
+  quote do
+    var!(a) = 1
+  end
+end
+```
+
+
+
+---
 class: center, demo-time
 <!-- ####################################################################### -->
 
